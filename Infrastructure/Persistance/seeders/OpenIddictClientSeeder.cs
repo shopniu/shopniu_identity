@@ -8,16 +8,18 @@ public static class OpenIddictClientSeeder
     {
         var manager = serviceProvider.GetRequiredService<IOpenIddictApplicationManager>();
 
-        if (await manager.FindByClientIdAsync("shopniu-web") is not null) return;
-
-        await manager.CreateAsync(new OpenIddictApplicationDescriptor
+        var descriptor = new OpenIddictApplicationDescriptor
         {
             ClientId = "shopniu-web",
             ClientType = OpenIddictConstants.ClientTypes.Public,
             ConsentType = OpenIddictConstants.ConsentTypes.Implicit,
             DisplayName = "Shopniu Web Application",
-            RedirectUris = { new Uri("https://oauth.pstmn.io/v1/callback") },
-            PostLogoutRedirectUris = { new Uri("https://localhost:3000/") },
+            RedirectUris =
+            {
+                new Uri("http://localhost:3000/callback"),
+                new Uri("https://oauth.pstmn.io/v1/callback")
+            },
+            PostLogoutRedirectUris = { new Uri("http://localhost:3000/") },
             Permissions =
 {
     OpenIddictConstants.Permissions.Endpoints.Authorization,
@@ -37,6 +39,17 @@ public static class OpenIddictClientSeeder
             {
                 OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange
             }
-        });
+        };
+
+        var application = await manager.FindByClientIdAsync("shopniu-web");
+
+        if (application is null)
+        {
+            await manager.CreateAsync(descriptor);
+        }
+        else
+        {
+            await manager.UpdateAsync(application, descriptor);
+        }
     }
 }

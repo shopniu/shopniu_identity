@@ -1,8 +1,8 @@
-@model Shopniu_identity.Aplication.Authentication.Models.LoginViewModel
+@model Shopniu_identity.Aplication.Authentication.Models.RegisterViewModel
 
 @{
-    Layout = null; // Si tienes un _Layout.cshtml global, puedes cambiar esto a true
-    ViewData["Title"] = "Iniciar sesión — Shopniu";
+    Layout = null;
+    ViewData["Title"] = "Registrarse — Shopniu";
 }
 
 <!DOCTYPE html>
@@ -48,7 +48,7 @@
             .login-card {
                 background: var(--card-bg);
                 width: 100%;
-                max-width: 400px;
+                max-width: 440px;
                 padding: 2.5rem 2rem;
                 border-radius: 12px;
                 box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
@@ -99,19 +99,13 @@
                 box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
             }
 
-            .remember-me {
+            .form-row {
                 display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 1.5rem;
-                font-size: 0.875rem;
+                gap: 1rem;
             }
 
-            .checkbox-container {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                color: var(--text-muted);
+            .form-row .form-group {
+                flex: 1;
             }
 
             .btn-submit {
@@ -176,7 +170,7 @@
     <div class="login-card">
         <div class="brand">
             <h1>Shopniu</h1>
-            <p>Ingresa a tu cuenta para continuar</p>
+            <p>Crea tu cuenta para comenzar</p>
         </div>
 
         @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
@@ -186,13 +180,33 @@
             </div>
         }
 
-        <form asp-controller="Account" asp-action="Login" method="post">
+        <form asp-controller="Account" asp-action="Register" method="post">
             <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="FirstName">Nombre</label>
+                    <input asp-for="FirstName" class="form-control" placeholder="Juan" autofocus />
+                    <span asp-validation-for="FirstName"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="LastName">Apellido</label>
+                    <input asp-for="LastName" class="form-control" placeholder="Pérez" />
+                    <span asp-validation-for="LastName"></span>
+                </div>
+            </div>
 
             <div class="form-group">
                 <label asp-for="Email">Correo Electrónico</label>
-                <input asp-for="Email" class="form-control" placeholder="tu@ejemplo.com" autofocus />
+                <input asp-for="Email" class="form-control" placeholder="tu@ejemplo.com" />
                 <span asp-validation-for="Email"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="UserName">Nombre de usuario (opcional)</label>
+                <input asp-for="UserName" class="form-control" placeholder="juanperez" />
+                <span asp-validation-for="UserName"></span>
             </div>
 
             <div class="form-group">
@@ -201,19 +215,18 @@
                 <span asp-validation-for="Password"></span>
             </div>
 
-            <div class="remember-me">
-                <label class="checkbox-container">
-                    <input type="checkbox" asp-for="RememberMe" />
-                    <span>Recordarme</span>
-                </label>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Confirmar contraseña</label>
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="••••••••" />
+                <span asp-validation-for="ConfirmPassword"></span>
             </div>
 
-            <button type="submit" class="btn-submit">Iniciar sesión</button>
+            <button type="submit" class="btn-submit">Crear cuenta</button>
         </form>
 
         <div class="auth-alt">
-            ¿No tenés cuenta?
-            <a href="~/account/register@(string.IsNullOrEmpty(Model.ReturnUrl) ? "" : $"?returnUrl={Uri.EscapeDataString(Model.ReturnUrl)}")">Registrate</a>
+            ¿Ya tenés cuenta?
+            <a href="~/account/login@(string.IsNullOrEmpty(Model.ReturnUrl) ? "" : $"?returnUrl={Uri.EscapeDataString(Model.ReturnUrl)}")">Iniciar sesión</a>
         </div>
     </div>
 

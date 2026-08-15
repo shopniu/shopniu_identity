@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Shopniu_identity.Application.Users;
+using Shopniu_identity.Application.Users.UseCases.RegisterUser;
 
 namespace Shopniu_identity.Controllers;
 
@@ -30,10 +31,14 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateUser([FromBody] CreateUserCommand command)
+    public async Task<IActionResult> CreateUser([FromBody] RegisterUserCommand command)
     {
-        var user = await _userHandler.HandleCreateUser(command);
-        return CreatedAtAction(nameof(GetUserById), new { userId = user.Id }, user);
+        var result = await _userHandler.HandleRegisterUser(command);
+
+        if (!result.Succeeded)
+            return BadRequest(new { errors = result.Errors });
+
+        return CreatedAtAction(nameof(GetUserById), new { userId = result.User!.Id }, result.User);
     }
 
 

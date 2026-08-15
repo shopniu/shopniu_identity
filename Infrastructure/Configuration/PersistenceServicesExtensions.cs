@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Shopniu_identity.Infrastructure.Persistance;
 
 namespace Shopniu_identity.Infrastructure.Configuration;
@@ -14,7 +15,7 @@ public static class PersistenceServicesExtensions
         }
 
         services.AddDbContextPool<AppDbContext>(options =>
-            options.UseSqlServer(defaultConnection)
+            options.UseNpgsql(defaultConnection)
                    .UseOpenIddict()); // Use OpenIddict for authentication and authorization
 
         return services;

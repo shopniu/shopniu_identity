@@ -39,7 +39,7 @@ public static class OpenIddictServicesExtensions
             })
             .AddValidation(options =>
             {
-                options.AddAudiences("shopniu_gateway");
+                options.AddAudiences("shopniu-api");
                 options.UseLocalServer();
                 options.UseAspNetCore();
             });

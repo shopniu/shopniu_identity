@@ -5,6 +5,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
@@ -49,6 +50,41 @@ public class AuthController : Controller
                 .SetDestinations(GetDestinations);
 
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public IActionResult Me()
+    {
+        var principal = User;
+
+        var id = principal.FindFirstValue(OpenIddictConstants.Claims.Subject);
+        var name =
+            principal.FindFirstValue(OpenIddictConstants.Claims.Name)
+            ?? principal.Identity?.Name;
+        var email = principal.FindFirstValue(OpenIddictConstants.Claims.Email);
+
+        var roles = principal
+            .FindAll(OpenIddictConstants.Claims.Role)
+            .Select(claim => claim.Value)
+            .ToList();
+
+        var permissions = principal
+            .FindAll("permission")
+            .Select(claim => claim.Value)
+            .ToList();
+
+        return Ok(new
+        {
+            user = new
+            {
+                id,
+                name,
+                email,
+                roles,
+                permissions
+            }
+        });
     }
 
     [HttpPost("token")]
