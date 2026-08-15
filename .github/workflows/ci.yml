@@ -31,7 +31,7 @@ jobs:
 
       - name: Restore
         env:
-          GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_PACKAGES_TOKEN }}
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.NUGET_PACKAGES_TOKEN }}
         run: dotnet restore
 
       - name: Format check
@@ -94,7 +94,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            NUGET_GITHUB_TOKEN=${{ secrets.GITHUB_PACKAGES_TOKEN }}
+            NUGET_GITHUB_TOKEN=${{ secrets.NUGET_PACKAGES_TOKEN }}
             GITHUB_ACTOR=${{ github.actor }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
