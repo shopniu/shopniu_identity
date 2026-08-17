@@ -83,6 +83,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha
+            type=raw,value=${{ github.sha }}
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push
@@ -98,3 +99,35 @@ jobs:
             GITHUB_ACTOR=${{ github.actor }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to Azure Container Apps
+    needs: docker-publish
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    permissions:
+      contents: read
+
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Container Apps
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          imageToDeploy: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          containerAppName: shopniu-identity
+          resourceGroup: shopniu
+          containerAppEnvironment: thankfulmushroom-4e17c339
+          registry-url: ghcr.io
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.NUGET_PACKAGES_TOKEN }}
+          targetPort: 8080
+
+      - name: Azure logout
+        if: always()
+        run: az logout
