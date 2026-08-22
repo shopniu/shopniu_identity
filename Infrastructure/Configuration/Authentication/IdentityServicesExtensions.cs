@@ -44,7 +44,9 @@ public static class IdentityServicesExtensions
         {
             options.LoginPath = "/account/login";
             options.AccessDeniedPath = "/account/accessdenied";
-            options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+            // 30 días: con "Recordar sesión" la cookie interactiva persiste al
+            // cierre del navegador y no se corta a los 30 minutos.
+            options.ExpireTimeSpan = TimeSpan.FromDays(30);
         });
 
         return services;

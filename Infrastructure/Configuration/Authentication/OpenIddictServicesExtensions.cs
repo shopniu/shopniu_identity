@@ -24,6 +24,12 @@ public static class OpenIddictServicesExtensions
 
                 options.AllowRefreshTokenFlow();
 
+                // "Recordar sesión": los tokens del front duran 30 días. Sin
+                // estos valores OpenIddict usa defaults cortos (el access expira
+                // pronto y el front perdía la sesión).
+                options.SetAccessTokenLifetime(TimeSpan.FromDays(30))
+                       .SetRefreshTokenLifetime(TimeSpan.FromDays(30));
+
                 options.RegisterScopes("api", "profile", "email", "roles", "offline_access");
 
                 options.AddDevelopmentEncryptionCertificate()
