@@ -31,6 +31,7 @@ public static class OpenIddictServicesExtensions
 
                 options.UseAspNetCore()
                        .EnableAuthorizationEndpointPassthrough()
+                       .EnableEndSessionEndpointPassthrough()
                        .EnableTokenEndpointPassthrough()
                        .EnableUserInfoEndpointPassthrough()
                        .EnableStatusCodePagesIntegration();

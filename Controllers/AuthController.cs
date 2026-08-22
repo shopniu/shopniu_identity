@@ -126,6 +126,24 @@ public class AuthController : Controller
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
+    [HttpGet("logout")]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var request = HttpContext.GetOpenIddictServerRequest() ?? throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+
+        // El flujo de la web viene con post_logout_redirect_uri (ya validado
+        // por OpenIddict contra el cliente): se firma out la cookie de
+        // identidad y se redirige de vuelta al front.
+        if (!string.IsNullOrWhiteSpace(request.PostLogoutRedirectUri))
+        {
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            return Redirect(request.PostLogoutRedirectUri);
+        }
+
+        return SignOut(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme);
+    }
+
     private static IEnumerable<string> GetDestinations(Claim claim)
     {
         switch (claim.Type)
