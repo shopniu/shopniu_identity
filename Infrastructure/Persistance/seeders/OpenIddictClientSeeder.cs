@@ -17,9 +17,14 @@ public static class OpenIddictClientSeeder
             RedirectUris =
             {
                 new Uri("http://localhost:3000/callback"),
-                new Uri("https://oauth.pstmn.io/v1/callback")
+                new Uri("https://oauth.pstmn.io/v1/callback"),
+                new Uri("https://purple-flower-0a8e4230f.7.azurestaticapps.net/callback")
             },
-            PostLogoutRedirectUris = { new Uri("http://localhost:3000/") },
+            PostLogoutRedirectUris =
+            {
+                new Uri("http://localhost:3000/"),
+                new Uri("https://purple-flower-0a8e4230f.7.azurestaticapps.net/")
+            },
             Permissions =
 {
     OpenIddictConstants.Permissions.Endpoints.Authorization,
