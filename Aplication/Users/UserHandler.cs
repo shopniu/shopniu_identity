@@ -34,10 +34,5 @@ public class UserHandler
         return await _registerUserUseCase.ExecuteAsync(command);
     }
 
-    public async Task<RegisterUserAutoResult> HandleRegisterAutoUser(AutoRegisterUserCommand command)
-    {
-        return await _registerUserUseCase.ExecuteAutoAsync(command.FirstName, command.LastName, command.Email);
-    }
-
 
 }

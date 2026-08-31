@@ -26,25 +26,6 @@ public class RegisterUserUseCase
         return RegisterUserResult.Success(user);
     }
 
-    /// <summary>
-    /// Alta sin credenciales del cliente: el backend genera la contraseña y la
-    /// devuelve (solo al BFF) para poder emitir tokens sin exponerla al
-    /// navegador. El envío por correo es una iteración futura.
-    /// </summary>
-    public async Task<RegisterUserAutoResult> ExecuteAutoAsync(string firstName, string lastName, string email)
-    {
-        var userName = await GenerateUserNameAsync(email);
-        var password = PasswordGenerator.Generate();
-
-        var user = new User(firstName, lastName, email, userName);
-
-        var result = await _userManager.CreateAsync(user, password);
-        if (!result.Succeeded)
-            return RegisterUserAutoResult.Failure(result.Errors.Select(e => e.Description));
-
-        return RegisterUserAutoResult.Success(user, password);
-    }
-
     private async Task<string> GenerateUserNameAsync(string email)
     {
         var baseName = email.Split('@')[0].Trim();

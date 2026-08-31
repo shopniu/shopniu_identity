@@ -4,7 +4,7 @@ namespace Shopniu_identity.Infrastructure.Persistance.Seeders;
 
 public static class OpenIddictClientSeeder
 {
-    public static async Task SeedAsync(IServiceProvider serviceProvider, IConfiguration? configuration = null)
+    public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
         var manager = serviceProvider.GetRequiredService<IOpenIddictApplicationManager>();
 
@@ -55,42 +55,6 @@ public static class OpenIddictClientSeeder
         else
         {
             await manager.UpdateAsync(application, descriptor);
-        }
-
-        // Cliente confidencial del BFF (Next.js): único autorizado a usar el
-        // password grant para registrar al invitado en el checkout sin que el
-        // navegador maneje la contraseña generada por el backend.
-        var bffSecret = configuration?["OpenIddict:ClientSecrets:Bff"] ?? "shopniu-bff-dev-secret";
-
-        var bffDescriptor = new OpenIddictApplicationDescriptor
-        {
-            ClientId = "shopniu-bff",
-            ClientType = OpenIddictConstants.ClientTypes.Confidential,
-            ConsentType = OpenIddictConstants.ConsentTypes.Implicit,
-            DisplayName = "Shopniu BFF",
-            ClientSecret = bffSecret,
-            Permissions =
-            {
-                OpenIddictConstants.Permissions.Endpoints.Token,
-                OpenIddictConstants.Permissions.GrantTypes.Password,
-                OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                OpenIddictConstants.Permissions.Scopes.Email,
-                OpenIddictConstants.Permissions.Scopes.Profile,
-                OpenIddictConstants.Permissions.Scopes.Roles,
-                OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.OfflineAccess,
-                OpenIddictConstants.Permissions.Prefixes.Scope + "shopniu-api"
-            }
-        };
-
-        var bffApplication = await manager.FindByClientIdAsync("shopniu-bff");
-
-        if (bffApplication is null)
-        {
-            await manager.CreateAsync(bffDescriptor);
-        }
-        else
-        {
-            await manager.UpdateAsync(bffApplication, bffDescriptor);
         }
     }
 }

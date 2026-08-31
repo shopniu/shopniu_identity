@@ -41,32 +41,5 @@ public class UserController : Controller
         return CreatedAtAction(nameof(GetUserById), new { userId = result.User!.Id }, result.User);
     }
 
-    /// <summary>
-    /// Alta de cuenta sin contraseña del cliente (backend la genera). Lo usa el
-    /// BFF desde el checkout para registrar al invitado y emitir tokens vía
-    /// password grant sin exponer credenciales al navegador. Devuelve la
-    /// contraseña generada SOLO a este caller (servidor a servidor).
-    /// </summary>
-    [HttpPost("auto-register")]
-    public async Task<IActionResult> AutoRegisterUser([FromBody] AutoRegisterUserCommand command)
-    {
-        var result = await _userHandler.HandleRegisterAutoUser(command);
-
-        if (!result.Succeeded)
-            return BadRequest(new { errors = result.Errors });
-
-        return Ok(new
-        {
-            user = new
-            {
-                id = result.User!.Id,
-                email = result.User.Email,
-                firstName = result.User.FirstName,
-                lastName = result.User.LastName
-            },
-            generatedPassword = result.GeneratedPassword
-        });
-    }
-
 
 }

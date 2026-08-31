@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Shopniu_identity.Aplication.Authentication.Auth.UseCases.Authorize;
 using Shopniu_identity.Aplication.Authentication.Auth.UseCases.Exchange;
-using Shopniu_identity.Domain.Entities.UserEntity;
 
 
 namespace Shopniu_identity.Aplication.Authentication.Auth;
@@ -26,12 +25,6 @@ public class AuthHandler
     }
 
     public async Task<ClaimsPrincipal> ExchangeTokenAsync(ClaimsPrincipal user)
-    {
-        var identity = await _exchangeTokenUseCase.ExecuteAsync(user);
-        return identity;
-    }
-
-    public async Task<ClaimsPrincipal> ExchangeTokenAsync(User user)
     {
         var identity = await _exchangeTokenUseCase.ExecuteAsync(user);
         return identity;

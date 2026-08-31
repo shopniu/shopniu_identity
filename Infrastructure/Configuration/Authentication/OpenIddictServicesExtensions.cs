@@ -24,12 +24,6 @@ public static class OpenIddictServicesExtensions
 
                 options.AllowRefreshTokenFlow();
 
-                // Password grant (ROP): SOLO para el cliente confidencial
-                // "shopniu-bff", que registra al invitado en el checkout sin
-                // exponer la contraseña generada al navegador. El cliente
-                // público "shopniu-web" no tiene este permiso.
-                options.AllowPasswordFlow();
-
                 // "Recordar sesión": los tokens del front duran 30 días. Sin
                 // estos valores OpenIddict usa defaults cortos (el access expira
                 // pronto y el front perdía la sesión).
