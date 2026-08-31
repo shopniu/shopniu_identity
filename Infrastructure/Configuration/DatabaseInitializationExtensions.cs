@@ -32,7 +32,7 @@ public static class DatabaseInitializationExtensions
             await RolePermissionSeeder.SeedAsync(dbContext, roleManager);
             await UserSeeder.SeedAsync(scope.ServiceProvider);
             await OpenIddictScopeSeeder.SeedAsync(scope.ServiceProvider);
-            await OpenIddictClientSeeder.SeedAsync(scope.ServiceProvider);
+            await OpenIddictClientSeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
         }
 
         return app;

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using Shopniu_identity.Aplication.Authentication.Auth;
+using Shopniu_identity.Domain.Entities.UserEntity;
 
 namespace Shopniu_identity.Routes;
 
@@ -19,11 +20,13 @@ public class AuthController : Controller
 {
     private readonly AuthHandler _authHandler;
     private readonly IOpenIddictScopeManager _scopeManager;
+    private readonly UserManager<User> _userManager;
 
-    public AuthController(AuthHandler authHandler, IOpenIddictScopeManager scopeManager)
+    public AuthController(AuthHandler authHandler, IOpenIddictScopeManager scopeManager, UserManager<User> userManager)
     {
         _authHandler = authHandler;
         _scopeManager = scopeManager;
+        _userManager = userManager;
     }
 
     [HttpGet("authorize")]
@@ -92,9 +95,42 @@ public class AuthController : Controller
     {
         var request = HttpContext.GetOpenIddictServerRequest() ?? throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-        if (!request.IsAuthorizationCodeGrantType() && !request.IsRefreshTokenGrantType())
+        if (!request.IsAuthorizationCodeGrantType() && !request.IsRefreshTokenGrantType() && !request.IsPasswordGrantType())
         {
             throw new InvalidOperationException("The specified grant type is not supported.");
+        }
+
+        if (request.IsPasswordGrantType())
+        {
+            var username = request.Username;
+            var password = request.Password;
+
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, properties: new AuthenticationProperties(new Dictionary<string, string?>
+                {
+                    [OpenIddictServerAspNetCoreConstants.Properties.Error] = OpenIddictConstants.Errors.InvalidGrant,
+                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "Credenciales inválidas."
+                }));
+            }
+
+            var user = await _userManager.FindByEmailAsync(username);
+            if (user is null || !await _userManager.CheckPasswordAsync(user, password))
+            {
+                return Forbid(authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, properties: new AuthenticationProperties(new Dictionary<string, string?>
+                {
+                    [OpenIddictServerAspNetCoreConstants.Properties.Error] = OpenIddictConstants.Errors.InvalidGrant,
+                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "Credenciales inválidas."
+                }));
+            }
+
+            var passwordIdentity = await _authHandler.ExchangeTokenAsync(user);
+
+            passwordIdentity.SetScopes(request.GetScopes())
+                .SetResources(await _scopeManager.ListResourcesAsync(passwordIdentity.GetScopes()).ToListAsync())
+                .SetDestinations(GetDestinations);
+
+            return SignIn(new ClaimsPrincipal(passwordIdentity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
         var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
